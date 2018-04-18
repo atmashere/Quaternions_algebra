@@ -481,6 +481,7 @@
 
     TQuaternion::TQuaternion(): q0(0.), Q(3)
     {
+        q0   = 0.;
         Q[0] = 0.;
         Q[1] = 0.;
         Q[2] = 0.;
@@ -516,6 +517,36 @@
 
         return (*this);
     }
+
+    TQuaternion TQuaternion::operator + (const TQuaternion& arg) const
+    {
+       TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
+       Quat.q0   = q0   + arg.q0;
+       Quat.Q[0] = Q[0] + arg.Q[0];
+       Quat.Q[1] = Q[1] + arg.Q[1];
+       Quat.Q[2] = Q[2] + arg.Q[2];
+
+       return Quat;
+    }
+
+    TQuaternion TQuaternion::operator * (const TQuaternion& arg) const
+    {
+       TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
+       Quat.q0 = q0*arg.q0 - Q*arg.Q;
+       Quat.Q = q0 * arg.Q + arg.q0 * Q + Q^arg.Q;
+       return Quat;
+    }
+
+    TQuaternion TQuaternion::operator * (const TVector& arg) const
+    {
+        TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
+        Quat.q0 = - Q*arg;
+        Quat.Q = q0 * arg + Q^arg;
+        return Quat;
+    }
+
+
+
 
 
 
