@@ -1,8 +1,10 @@
-/* Model Linear	*/
-namespace MyLinearAlgebra
-{
-	/* Anticipating declaration	*/
+#pragma once
+
+    /* Anticipating declaration class Matrix	*/
 	class TMatrix;
+
+    /* Anticipating declaration	class Quaternion  */
+    class TQuaternion;
 
 	/* Declaration of the class vectors	*/
 	class TVector
@@ -76,6 +78,18 @@ namespace MyLinearAlgebra
 
 			/* Friendly function - the operator multiplying the number of vector	*/
 			friend TVector operator * (double lvalue, const TVector& rvalue);
+
+            /* Operator of multiplication of a vector by a quaternion	*/
+            TQuaternion operator * (const TQuaternion& arg) const;
+
+            /* Rotation of the vector around axis on phi by Ridrig`s formula	*/
+            TVector rotateByRodrigFormula(double phi, const TVector& axis) const;
+
+            /* Rotation of the vector around axis on phi	*/
+            TVector rotate(double phi, const TVector& axis) const;
+
+           /* Rotation of the vector by quaternion   */
+            TVector rotateByQuaternion(const TQuaternion& L) const;
 	};
 
 
@@ -162,4 +176,65 @@ namespace MyLinearAlgebra
 			/* Function swap rows	*/
 			TMatrix& swapRows(int i, int j);
 	};
-};
+
+    class TQuaternion {
+
+        /* Access modifier	*/
+        protected:
+            /*Scalar part */
+            double q0;
+
+            /*Vector part */
+            TVector Q;
+
+        /* Access modifier	*/
+        public:
+            /*Constructor standart  */
+            TQuaternion();
+
+            /*Constructor  set parameters  */
+            TQuaternion(double l0, double l1, double l2, double l3);
+
+            /*Constructor with phi and axis  */
+            TQuaternion(double phi, const TVector& e);
+
+            /*Copy constructor  */
+            TQuaternion(const TQuaternion& rvalue);
+
+            /* Get scalar part	*/
+            inline double scal() const { return q0; }
+
+            /* Get vector part	*/
+            inline TVector vect() const { return Q; }
+
+            /* Assignment operator	*/
+            TQuaternion& operator = (const TQuaternion& rvalue);
+
+            /* Subtraction operator quaternions	*/
+            TQuaternion operator - (const TQuaternion& arg) const;
+
+            /* Addition operator quaternions	*/
+            TQuaternion operator + (const TQuaternion& arg) const;
+
+            /* Quaternions multiplication operator	*/
+            TQuaternion operator * (const TQuaternion& arg) const;
+
+            /* Operator to multiply a quaternion by a vector	*/
+            TQuaternion operator * (const TVector& arg) const;
+
+            /* Operator to turn quaternion	*/
+            TQuaternion operator ! () const;
+
+            /* Normalized quaternion	*/
+            TQuaternion& norm();
+
+            /* Quaternion cojuction	*/
+            TQuaternion conj() const;
+
+            /* Get roatate matrix from quaternion	*/
+            TMatrix toRotateMatrix() const;
+
+            /* Function of creation quaternion by Krylov angles	*/
+            static TQuaternion fromKrylovAngles(double yaw, double pitch, double roll);
+    };
+
