@@ -533,7 +533,7 @@
     {
        TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
        Quat.q0 = q0*arg.q0 - Q*arg.Q;
-       Quat.Q = q0 * arg.Q + arg.q0 * Q + Q^arg.Q;
+       Quat.Q = q0*arg.Q + arg.q0*Q + (Q^arg.Q);
        return Quat;
     }
 
@@ -541,11 +541,21 @@
     {
         TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
         Quat.q0 = - Q*arg;
-        Quat.Q = q0 * arg + Q^arg;
+        Quat.Q = q0*arg + (Q^arg);
         return Quat;
     }
 
+    TQuaternion TQuaternion::operator ! () const
+    {
+            TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
 
+            Quat.q0   = q0;
+            Quat.Q[0] = - Q[0];
+            Quat.Q[1] = - Q[1];
+            Quat.Q[2] = - Q[2];
+
+            return Quat;
+     }
 
 
 
