@@ -228,7 +228,7 @@
             /* Normalized quaternion	*/
             TQuaternion& norm();
 
-            /* Quaternion cojuction	*/
+            /* Conjugate quaternion	*/
             TQuaternion conj() const;
 
             /* Get roatate matrix from quaternion	*/

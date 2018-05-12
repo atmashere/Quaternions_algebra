@@ -479,6 +479,8 @@
         return *this;
     }
 
+//----------------------------------------------------------------------------------
+
     TQuaternion::TQuaternion(): q0(0.), Q(3)
     {
         q0   = 0.;
@@ -520,43 +522,92 @@
 
     TQuaternion TQuaternion::operator + (const TQuaternion& arg) const
     {
-       TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
-       Quat.q0   = q0   + arg.q0;
-       Quat.Q[0] = Q[0] + arg.Q[0];
-       Quat.Q[1] = Q[1] + arg.Q[1];
-       Quat.Q[2] = Q[2] + arg.Q[2];
+//       TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
+//       Quat.q0   = q0   + arg.q0;
+//       Quat.Q[0] = Q[0] + arg.Q[0];
+//       Quat.Q[1] = Q[1] + arg.Q[1];
+//       Quat.Q[2] = Q[2] + arg.Q[2];
 
-       return Quat;
+       return  TQuaternion(q0 + arg.q0, Q[0] + arg.Q[0], Q[1] + arg.Q[1], Q[2] + arg.Q[2]);
     }
 
     TQuaternion TQuaternion::operator * (const TQuaternion& arg) const
     {
        TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
+
        Quat.q0 = q0*arg.q0 - Q*arg.Q;
        Quat.Q = q0*arg.Q + arg.q0*Q + (Q^arg.Q);
+
        return Quat;
     }
 
     TQuaternion TQuaternion::operator * (const TVector& arg) const
     {
         TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
-        Quat.q0 = - Q*arg;
+
+        Quat.q0 = -Q*arg;
         Quat.Q = q0*arg + (Q^arg);
+
         return Quat;
     }
 
     TQuaternion TQuaternion::operator ! () const
     {
-            TQuaternion Quat(q0, Q[0], Q[1], Q[2]);
+        return conj().norm();
+    }
 
-            Quat.q0   = q0;
-            Quat.Q[0] = - Q[0];
-            Quat.Q[1] = - Q[1];
-            Quat.Q[2] = - Q[2];
-
-            return Quat;
+     TQuaternion TQuaternion::conj() const
+     {
+         return TQuaternion(q0, -Q[0], -Q[1], -Q[2]);
      }
 
+     TQuaternion& TQuaternion::norm()
+     {
+         double norma = (q0)  *(q0)  +
+                        (Q[0])*(Q[0])+
+                        (Q[1])*(Q[1])+
+                        (Q[2])*(Q[2]);
+         q0   = q0/norma;
+         Q[0] = Q[0]/norma;
+         Q[1] = Q[1]/norma;
+         Q[2] = Q[2]/norma;
+
+
+         return (*this);
+     }
+
+     TMatrix TQuaternion::toRotateMatrix() const
+     {
+        TMatrix M(3, 3);
+
+        M(0,0) = q0*q0 + Q[0]*Q[0] - Q[1]*Q[1] - Q[2]*Q[2];
+        M(0,1) = 2*(Q[0]*Q[1] - q0*Q[2]);
+        M(0,2) = 2*(Q[0]*Q[2] + q0*Q[1]);
+
+        M(1,0) = 2*(Q[0]*Q[1] + q0*Q[2]);
+        M(1,1) = q0*q0 - Q[0]*Q[0] + Q[1]*Q[1] - Q[2]*Q[2];
+        M(1,2) = 2*(Q[1]*Q[2] - q0*Q[0]);
+
+        M(2,0) = 2*(Q[0]*Q[2] - q0*Q[1]);
+        M(2,1) = 2*(Q[1]*Q[2] + q0*Q[0]);
+        M(2,2) = q0*q0 - Q[0]*Q[0] - Q[1]*Q[1] + Q[2]*Q[2];
+
+        return M;
+     }
+
+     TQuaternion TQuaternion::fromKrylovAngles(double yaw, double pitch, double roll)
+     {
+         yaw   = yaw*180/M_PI;
+         pitch = pitch*180/M_PI;
+         roll  = roll*180/M_PI;
+
+         return TQuaternion(
+                     cos(yaw/2.)*cos(pitch/2.)*cos(roll/2.) - sin(yaw/2.)*sin(pitch/2.)*sin(roll/2.),
+                     cos(yaw/2.)*cos(pitch/2.)*sin(roll/2.) + sin(yaw/2.)*sin(pitch/2.)*cos(roll/2.),
+                     sin(yaw/2.)*cos(pitch/2.)*cos(roll/2.) + cos(yaw/2.)*sin(pitch/2.)*sin(roll/2.),
+                     cos(yaw/2.)*sin(pitch/2.)*cos(roll/2.) + sin(yaw/2.)*cos(pitch/2.)*sin(roll/2.)
+                 );
+     }
 
 
 
